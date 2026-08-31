@@ -1,8 +1,8 @@
 # Progress Tracker
 
 **Started:** 2026-08-31
-**Current module:** 01 — Your first agent
-**Status:** scaffold ready, Module 01 buildable
+**Current module:** 02 — Reading the stream
+**Status:** Module 01 complete
 
 > How to use this: tick boxes as you go. After each module, fill in the **Notes** line —
 > especially anything that confused you. Tell me "done with module N" and I'll update
@@ -13,12 +13,12 @@
 ## Progress at a glance
 
 ```
-Part I   — The Agent Loop        [░░░░]  0/4
+Part I   — The Agent Loop        [█░░░]  1/4
 Part II  — MCP                   [░░░░]  0/4
 Part III — Production Concerns   [░░░]   0/3
 Part IV  — Capstone              [░]     0/1
                                  ──────────────
-                          TOTAL   0/12
+                          TOTAL   1/12
 ```
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` complete
@@ -27,15 +27,35 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` complete
 
 ## Part I — The Agent Loop
 
-### [ ] Module 01 — Your first agent, and what auth actually is
-- [ ] `npm install` succeeded
-- [ ] `npm run check` prints my auth method
-- [ ] `npm run m01` returns a response from Claude
-- [ ] I read the message stream, not just the final answer
-- [ ] **Break it:** set a bad `ANTHROPIC_API_KEY`, watched it fail, then unset it
-- [ ] I can explain where my agent's credentials come from
+### [x] Module 01 — Your first agent, and what auth actually is
+- [x] `npm install` succeeded
+- [x] `npm run check` prints my auth method
+- [x] `npm run m01` returns a response from Claude
+- [x] I read the message stream, not just the final answer
+- [x] **Break it:** set a bad `ANTHROPIC_API_KEY` — and it *didn't* fail. Found out why.
+- [x] I can explain where my agent's credentials come from
+- [x] Understand `apiKeySource` as the real answer vs. "is a key set?"
 
-**Notes:**
+**Notes:** The break-it step as originally written doesn't reproduce. Setting
+`ANTHROPIC_API_KEY=sk-ant-definitely-not-valid` and running `m01` **succeeds**,
+because the CLI only honors env API keys on its approval list
+(`customApiKeyResponses` in `~/.claude.json`) and silently falls back to the
+subscription login otherwise. Patched `src/00-auth-check.ts` to detect and
+report this, and corrected `COURSE.md` + `README.md`.
+
+Real risks, which are *not* the stray-key scare: approval is **sticky** (a key
+approved once is used silently forever, including non-interactively), and the
+gate is **CLI-only** — `@anthropic-ai/sdk` called directly obeys the env key
+with no prompt.
+
+Also noted: 1 turn, ~40 words, **$0.05**. Cost is dominated by the harness
+system prompt + tool schemas re-sent every turn, not by prompt length. On
+subscription auth `total_cost_usd` is the API-equivalent, drawn against usage
+limits rather than billed.
+
+Confusing bits: `authMethod: "api_key"` reads alarming even when
+`apiKeySource: "/login managed key"` means subscription. Two fields, and the
+*source* is the one to trust.
 
 ---
 
@@ -188,6 +208,7 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` complete
 | Date | Module | What I did | What confused me |
 |---|---|---|---|
 | 2026-08-31 | — | Repo scaffolded, course planned | — |
+| 2026-08-31 | 01 | Auth check + first agent ran. Break-it step didn't break — traced it to the CLI's API-key approval gate. Patched the course docs to match reality. | `authMethod: "api_key"` vs `apiKeySource: "/login managed key"` — which field actually tells you who's paying |
 
 ---
 

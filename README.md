@@ -21,7 +21,16 @@ You're logged in through the Claude CLI, and the SDK inherits that credential au
 claude auth status
 ```
 
-**Leave `.env` empty.** Setting `ANTHROPIC_API_KEY` *overrides* your subscription login and switches you to metered per-token billing. `.env.example` documents the optional variables you'll need for specific modules (a GitHub token in Module 06, etc.).
+**Leave `.env` empty.** `ANTHROPIC_API_KEY` ranks above your subscription login and switches you to metered per-token billing.
+
+With one wrinkle worth knowing, because it's the difference between a scare and a real problem: the `claude` CLI only honors an env API key you've **explicitly approved** (it tracks this in `customApiKeyResponses` in `~/.claude.json`). An unapproved key is ignored and the CLI uses your login instead — so the Agent SDK, which drives that CLI, is fairly hard to mis-bill by accident. The exposure is elsewhere:
+
+- Approval is **sticky**. A key you approved once is used silently from then on, including in non-interactive SDK runs.
+- The gate is **CLI-only**. Use `@anthropic-ai/sdk` directly and `ANTHROPIC_API_KEY` wins immediately — no list, no prompt.
+
+Don't trust "no key is set" as your check. `npm run check` reports `apiKeySource`, which is what the CLI actually resolved.
+
+`.env.example` documents the optional variables you'll need for specific modules (a GitHub token in Module 06, etc.).
 
 ## Debugging in VS Code
 

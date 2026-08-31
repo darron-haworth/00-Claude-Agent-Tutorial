@@ -56,7 +56,7 @@ Goal: by the end of Part I you can build a working agent with custom tools, and 
 **Concepts**
 - What the Agent SDK *is*: Claude Code packaged as a library. It ships a full harness — agent loop, context management, built-in tools (Read/Write/Edit/Bash/Glob/Grep/WebSearch), permissions, sessions.
 - **How it runs:** the SDK spawns the `claude` CLI as a subprocess and talks to it. This surprises people. It's why the CLI must be installed, and why the SDK inherits your CLI login for free.
-- **Auth precedence** — the trap that costs people money: if `ANTHROPIC_API_KEY` is set, it **wins** over your subscription login and you get billed per token. An empty `.env` is a feature, not an omission.
+- **Auth precedence, and the gate in front of it.** `ANTHROPIC_API_KEY` ranks *above* your subscription login — but the CLI won't use a key you haven't approved. It keeps an approval list (`customApiKeyResponses` in `~/.claude.json`); an unlisted key is ignored, and the CLI falls back to your login. So "a key is set" and "a key is in effect" are different questions, and only `apiKeySource` from `claude auth status` answers the second. Two caveats that carry the real risk: approval is **sticky** (a key you approved once is honored silently forever, including in non-interactive runs), and the gate is **CLI behavior only** — call `@anthropic-ai/sdk` directly and the env key wins with no prompt at all.
 - `query()` returns an async generator. You consume it with `for await`.
 
 **Build**
@@ -64,9 +64,10 @@ Goal: by the end of Part I you can build a working agent with custom tools, and 
 - Run `npm run m01` → a one-shot prompt, printing only the final result.
 
 **Break it**
-- Set `ANTHROPIC_API_KEY=sk-ant-invalid` in `.env` and re-run. Watch a working setup fail. Understand *why* before you unset it.
+- `ANTHROPIC_API_KEY=sk-ant-definitely-not-valid npm run m01` — and watch it **succeed**. The experiment that fails to fail is the lesson: the key was never used. Re-run `npm run check` the same way to see the gate reported.
+- `env PATH=/nonexistent npx tsx src/01-hello-agent.ts` — a failure that *does* reproduce, for free. The SDK spawns `claude` as a child process; off `PATH`, there's no agent. This is what a broken `PATH` in CI looks like.
 
-**Checkpoint:** you can explain, without looking, where your agent's credentials come from and what would override them.
+**Checkpoint:** you can explain where your agent's credentials come from, what would override them, and why merely setting an env key usually *doesn't*.
 
 ---
 
