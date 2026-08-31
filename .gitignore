@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────
+# SECRETS — never commit these. Everything in this block first,
+# because a leaked key is the one mistake you can't take back.
+# ─────────────────────────────────────────────────────────────
+.env
+.env.*
+# NOTE: gitignore has no trailing comments — '#' only starts a comment at the
+# start of a line. A comment after a pattern becomes part of the pattern.
+# The placeholder template IS safe to commit, so re-include it:
+!.env.example
+*.key
+*.pem
+*.p12
+secrets.json
+credentials.json
+.credentials.json
+
+# Claude Code local state (may contain machine paths, tokens, approvals)
+.claude/settings.local.json
+.claude/*.local.json
+
+# MCP server configs that can hold inline tokens.
+# .mcp.json is committed on purpose (Module 08) — keep it secret-free
+# and reference env vars like ${GITHUB_TOKEN} instead of literals.
+.mcp.local.json
+mcp.local.json
+
+# ─────────────────────────────────────────────────────────────
+# Dependencies & build output
+# ─────────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+*.tsbuildinfo
+
+# ─────────────────────────────────────────────────────────────
+# Lesson scratch space — agents write real files here.
+# Ignored so agent output never lands in a commit by accident.
+# ─────────────────────────────────────────────────────────────
+# Note the '/*' rather than '/': git cannot re-include a file whose parent
+# directory is excluded, because it never descends into it. Ignoring the
+# *contents* lets the !.gitkeep exception below actually work.
+sandbox/*
+scratch/*
+!sandbox/.gitkeep
+!scratch/.gitkeep
+*.log
+
+# ─────────────────────────────────────────────────────────────
+# Editor / OS noise
+# ─────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+# Share debug/task config with anyone who clones this; keep personal editor
+# prefs (settings.json) and anything else out.
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json

@@ -1,0 +1,12 @@
+{
+  // VS Code will offer to install these when you open the folder.
+  // None are required — the debugger works with a stock install.
+  "recommendations": [
+    // Claude Code in the sidebar (you're already using it).
+    "anthropic.claude-code",
+    // Inline npm script running from package.json.
+    "eg2.vscode-npm-script",
+    // Syntax highlighting for .env files, so a stray quote is visible.
+    "mikestead.dotenv"
+  ]
+}

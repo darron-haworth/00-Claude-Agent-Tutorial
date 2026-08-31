@@ -1,0 +1,25 @@
+{
+  "name": "claude-agent-tutorial",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A hands-on course: from zero to proficient with the Claude Agent SDK and MCP",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "check": "tsx --env-file-if-exists=.env src/00-auth-check.ts",
+    "m01": "tsx --env-file-if-exists=.env src/01-hello-agent.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "^0.3.252",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.0",
+    "tsx": "^4.23.13",
+    "typescript": "^5.9.0"
+  }
+}

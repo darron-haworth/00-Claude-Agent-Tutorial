@@ -1,0 +1,108 @@
+{
+  // VS Code debug configurations.
+  //
+  //   Ctrl+Shift+D  opens Run and Debug
+  //   F5            starts the selected config
+  //   F9            toggles a breakpoint on the current line
+  //   F10 / F11     step over / step into
+  //   Shift+F5      stop
+  //
+  // Breakpoints only bind when VS CODE starts the process. Running
+  // `npm run m01` yourself in a terminal will never hit them.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // ── The one you'll use 90% of the time ──────────────────────────────
+      // Debugs whatever .ts file is focused in the editor, so you never need
+      // to add a config per lesson.
+      "name": "▶ Debug current file",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+
+      // TypeScript is not run through a build step. `--import tsx` registers
+      // tsx as a Node module loader that compiles .ts on the fly, with inline
+      // source maps — which is why breakpoints land in the .ts file and not
+      // in generated JS.
+      //
+      // `--env-file-if-exists` mirrors what the npm scripts do, so debug runs
+      // and terminal runs see identical env. The "-if-exists" variant means a
+      // missing .env is fine rather than a hard error.
+      "runtimeArgs": ["--import", "tsx", "--env-file-if-exists=.env"],
+
+      // A real terminal, not the Debug Console: gives you working stdin (you
+      // need it for the Module 11 REPL) and correct colors/emoji.
+      "console": "integratedTerminal",
+
+      // Keep F11 inside YOUR code instead of diving into Node guts or the SDK.
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
+
+      // ── The setting that matters most for THIS SDK ──────────────────────
+      // The Agent SDK doesn't call the API directly — it spawns the `claude`
+      // CLI as a child process. With auto-attach on, the debugger latches onto
+      // that child (and onto any stdio MCP server subprocess from Module 06+),
+      // spawning confusing extra debug sessions that pause on code you didn't
+      // write. Off means: debug my script, not the harness.
+      //
+      // When you DO need to debug a subprocess (a Module 07 MCP server), use
+      // the "Attach to a running process" config below instead.
+      "autoAttachChildProcesses": false
+    },
+    {
+      // ── Module 01 ──────────────────────────────────────────────────────
+      "name": "Auth check (no API call)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/00-auth-check.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": ["--import", "tsx", "--env-file-if-exists=.env"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
+      "autoAttachChildProcesses": false
+    },
+    {
+      "name": "Module 01 — Hello agent",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/01-hello-agent.ts",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": ["--import", "tsx", "--env-file-if-exists=.env"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
+      "autoAttachChildProcesses": false
+    },
+    {
+      // ── For Module 07+: debugging an MCP server ─────────────────────────
+      // An MCP server over stdio is started BY its client, so you can't launch
+      // it from here. Instead, start it with an inspector port open:
+      //
+      //   node --inspect-brk=9229 --import tsx mcp-servers/scribe-server/index.ts
+      //
+      // ...then run this config to attach. Execution is paused at line 1 until
+      // you do, so you can't miss early breakpoints.
+      "name": "Attach to a running process (port 9229)",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**", "${workspaceFolder}/node_modules/**"],
+      "restart": true
+    },
+    {
+      // ── Escape hatch ───────────────────────────────────────────────────
+      // Same as "Debug current file" but DOES follow child processes. Use it
+      // only when you deliberately want to step into the `claude` subprocess
+      // or an MCP server the SDK spawned. Expect extra debug sessions.
+      "name": "Debug current file + child processes",
+      "type": "node",
+      "request": "launch",
+      "program": "${file}",
+      "cwd": "${workspaceFolder}",
+      "runtimeArgs": ["--import", "tsx", "--env-file-if-exists=.env"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**"],
+      "autoAttachChildProcesses": true
+    }
+  ]
+}
